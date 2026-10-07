@@ -1,0 +1,39 @@
+# Run the whole stack on your own machine:  docker compose up --build
+# Then open http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: votes
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+  api:
+    build: ../api
+    environment:
+      REDIS_HOST: redis
+    depends_on: [redis]
+
+  worker:
+    build: ../worker
+    environment:
+      REDIS_HOST: redis
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/votes
+    depends_on: [redis, db]
+
+  web:
+    build:
+      context: ../client
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ../local/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [api]
+
+volumes:
+  pgdata:
