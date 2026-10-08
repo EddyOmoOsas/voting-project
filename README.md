@@ -118,4 +118,4 @@ Then open `http://<frontend-public-ip>` and cast a vote.
 - No authentication or rate limiting on `/vote`.
 - Password is loaded from `.env` on the server; next step is AWS Secrets Manager or SSM Parameter Store.
 - Add a CI/CD pipeline (GitHub Actions + OIDC + SSM) so a push to `main` deploys automatically.
-- Back up the Postgres volume (it lives on the backend instance's disk).
+![Network diagram](docs/network-diagram.svg)
