@@ -1,15 +1,18 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: votes
     volumes:
       - pgdata:/var/lib/postgresql/data
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
   api:
     build: ../api
+    restart: unless-stopped
     environment:
       REDIS_HOST: redis
     ports:
@@ -17,9 +20,10 @@ services:
     depends_on: [redis]
   worker:
     build: ../worker
+    restart: unless-stopped
     environment:
       REDIS_HOST: redis
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/votes
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/votes
     depends_on: [redis, db]
 volumes:
   pgdata:

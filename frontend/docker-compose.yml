@@ -1,6 +1,7 @@
 services:
   web:
     build: ../client
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
